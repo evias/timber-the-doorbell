@@ -1,0 +1,13 @@
+{
+    "sketch": "timber-esp32-v0/timber-esp32-v0.ino",
+    "port": "/dev/tty.usbserial-0001",
+    "board": "esp32:esp32:esp32",
+    "output": "../build",
+    "configuration": "JTAGAdapter=default,PSRAM=disabled,PartitionScheme=default,CPUFreq=240,FlashMode=qio,FlashFreq=80,FlashSize=4M,UploadSpeed=921600,LoopCore=1,EventsCore=1,DebugLevel=none,EraseFlash=none,ZigbeeMode=default",
+    "buildPreferences": [
+        [
+            "build.extra_flags",
+            "-DWIFI_SSID=\"Default\" -DWIFI_PASS=\"Default\" -DWEBHOOK_URL=\"http://homeassistant.local:8123/api/webhook/doorbell\" -DDEBUG_MODE=1"
+        ]
+    ]
+}
