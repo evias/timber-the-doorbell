@@ -3,6 +3,7 @@
 #include <WiFi.h>       // WiFi
 #include <HTTPClient.h> // HTTPClient
 #include <esp_sleep.h>  // esp_sleep_x
+#include <Wire.h>       // Wire
 
 #include "door_bell.h"
 #include "constants.h"
@@ -18,7 +19,8 @@ DoorBell::DoorBell(const char* name, const char* version)
       ip_address_("Unknown"),
       has_button_(false),
       btn_state_(HIGH), // HIGH=not pressed
-      btn_active_(false)
+      btn_active_(false),
+      uptime_since_(0)
 {
     sendDebugMessage(String("Hola! I am Timber :]"));
 }
@@ -31,6 +33,11 @@ void DoorBell::Setup()
     if (has_button_) {
         pinMode(button_.dev.pins[1], INPUT_PULLUP);
     }
+
+    int attempts = 0;
+    while (++attempts <= 5 && !setupGestureSensor())
+        Serial.println("Waiting for gesture sensor");
+        delay(100);
 
     setupWiFiConnection();
 
@@ -58,6 +65,10 @@ void DoorBell::OnWake() {
 /// @brief The OnLoop method verifies for button press actions.
 /// @details This method is called from the sketch's loop() function.
 void DoorBell::OnLoop() {
+    if (uptime_since_ == 0) {
+        uptime_since_ = millis();
+    }
+
     bool  old_ = btn_state_;
     btn_state_ = digitalRead(PRESS_BUTTON_PIN);
 
@@ -73,28 +84,53 @@ void DoorBell::OnLoop() {
         unsigned long pressDuration = btn_release_tz_ - btn_press_tz_;
         if (pressDuration >= DEBOUNCE_DELAY) {
             handleButtonPress();
-
-            // Go back to sleep after handling button press
-            delay(3000);  // Wait a bit before sleeping
-            enterDeepSleep();
         }
     }
 
+    handleGestureDetection();
     delay(10);
+
+    // go-to-sleep after 10 seconds of activity detection
+    unsigned long now_tz = millis();
+    if (now_tz >= uptime_since_ + 10000) {
+        enterDeepSleep();
+    }
 }
 
 /// @brief The SetButton method registers a press button with 1 pin number.
 /// @param id A name for the component, e.g. "my-press-button".
-/// @param pin_in A pin number, i.e. to the ESP32 pin number wired to + of the button.
+/// @param pin_in A pin number, i.e. the ESP32 pin number wired to + of the button.
 void DoorBell::SetButton(const char* id, unsigned short pin_in) {
     button_ = ButtonDevice{Device<1>{String(id), {pin_in}}};
     has_button_ = true;
 }
 
+/// @brief The SetSensor method registers a 3D gesture sensor with 3 (data) pins.
+/// @param id A name for the component, e.g. "my-gesture-device".
+/// @param pin_int A pin number, i.e. he ESP32 pin number wired to INT of the sensor.
+/// @param pin_sda A pin number, i.e. he ESP32 pin number wired to SDA of the sensor.
+/// @param pin_scl A pin number, i.e. he ESP32 pin number wired to SCL of the sensor.
+void DoorBell::SetSensor(
+    const char*id,
+    unsigned short pin_int,
+    unsigned short pin_sda,
+    unsigned short pin_scl
+) {
+    gesture_ = GestureDevice{Device<3>{String(id), {pin_int, pin_sda, pin_scl}}};
+    gesture_.addr = PAJ7620_CHIP_ADDR;
+    has_sensor_ = true;
+}
+
 /// @brief The GetButton method returns a ButtonDevice instance.
-/// @return The initialized ultrasonic sensor instance.
+/// @return The initialized press button ButtonDevice instance.
 ButtonDevice& DoorBell::GetButton() {
     return this->button_;
+}
+
+/// @brief The GetSensor method returns a GestureDevice instance.
+/// @return The initialized gesture sensor GestureDevice instance.
+GestureDevice& DoorBell::GetSensor() {
+    return this->gesture_;
 }
 
 /// @brief The GetName method returns the DoorBell name.
@@ -119,6 +155,35 @@ bool DoorBell::IsOnline() {
 /// @return Returns a local IP address when connected to a WiFi network.
 const String &DoorBell::GetIPAddress() {
     return this->ip_address_;
+}
+
+/// @brief The setupGestureSensor method configures the gesture sensor device.
+bool DoorBell::setupGestureSensor()
+{
+    // Order here is SDA, SCL
+    Wire.begin(gesture_.dev.pins[1], gesture_.dev.pins[2]);
+    Wire.setClock(400000);
+    delay(50);
+
+    // Wake up the gesture sensor
+    Wire.beginTransmission(PAJ7620_CHIP_ADDR);
+    Wire.endTransmission();
+    delay(5);
+    Wire.beginTransmission(PAJ7620_CHIP_ADDR);
+    Wire.endTransmission();
+
+    // Verify chip
+    gesture_.Write(PAJ7620_BANK_SEL, 0);
+    if(gesture_.Read(0x00) != 0x20) return false;
+
+    // Load init
+    for(uint16_t i = 0; i < sizeof(PAJ7620_INIT_SEQUENCE)/2; i++) {
+        gesture_.Write(
+            pgm_read_byte(&PAJ7620_INIT_SEQUENCE[i][0]),
+            pgm_read_byte(&PAJ7620_INIT_SEQUENCE[i][1]));
+    }
+    gesture_.Write(PAJ7620_BANK_SEL, 0);
+    return true;
 }
 
 /// @brief The setupWiFiConnection method configures the WiFi if needed.
@@ -203,17 +268,6 @@ void DoorBell::ensureWiFiConnected() {
     setupWiFiConnection();
 }
 
-/// @brief The handleButtonPress method sends a HTTP request (webhook).
-/// @details See also .vscode/arduino.json to update WEBHOOK_URL.
-/// CAUTION: URL_BUTTON_PRESS is defined with -DWEBHOOK_URL build flag.
-void DoorBell::handleButtonPress() {
-    if (sendHTTPRequest(URL_BUTTON_PRESS)) {
-        Serial.println("[INFO] Press notification sent successfully!");
-    } else {
-        Serial.println("[WARN] Failed to send press notification");
-    }
-}
-
 /// @brief The enterDeepSleep method shuts down the device.
 /// @details This method registers a Wake-On-Button-Press wakeup process.
 void DoorBell::enterDeepSleep() {
@@ -231,6 +285,35 @@ void DoorBell::enterDeepSleep() {
 
     // Enter deep sleep
     esp_deep_sleep_start();
+}
+
+/// @brief The handleButtonPress method sends a HTTP request (webhook).
+/// @details See also .vscode/arduino.json to update WEBHOOK_URL.
+/// CAUTION: URL_BUTTON_PRESS is defined with -DWEBHOOK_URL build flag.
+void DoorBell::handleButtonPress() {
+    if (sendHTTPRequest(URL_BUTTON_PRESS)) {
+        Serial.println("[INFO] Press notification sent successfully!");
+    } else {
+        Serial.println("[WARN] Failed to send press notification");
+    }
+}
+
+/// @brief The handleGestureDetection method detects gestures using a PAJ7260 chip.
+void DoorBell::handleGestureDetection() {
+    uint8_t res = gesture_.Read(PAJ7620_GESTURE_REG);
+    switch(res) {
+    case 0x01: Serial.println("RIGHT");  break;
+    case 0x02: Serial.println("LEFT");   break;
+    case 0x04: Serial.println("UP");     break;
+    case 0x08: Serial.println("DOWN");   break;
+    case 0x10: Serial.println("NEAR");   break;
+    case 0x20: Serial.println("FAR");    break;
+    case 0x40: Serial.println("CW");     break; // clockwise
+    case 0x80: Serial.println("CCW");    break; // counter clockwise
+    default:
+        break;
+    }
+    delay(50);
 }
 
 /// @brief The sendHTTPRequest method sends a HTTP request to a HASS webhook.

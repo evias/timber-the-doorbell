@@ -14,13 +14,17 @@ class DoorBell {
 
     String          name_;
     String       version_;
-    bool      has_button_;
     Preferences settings_;
 
     ButtonDevice  button_;
+    bool      has_button_;
     bool       btn_state_;
     bool      btn_active_;
 
+    GestureDevice gesture_;
+    bool       has_sensor_;
+
+    unsigned long uptime_since_;
     unsigned long btn_press_tz_;
     unsigned long btn_release_tz_;
 
@@ -33,18 +37,23 @@ public:
     void OnWake(); // called after Setup()
 
     void SetButton(const char*, unsigned short);
+    // The order here is ID, INT, SDA, SCL
+    void SetSensor(const char*, unsigned short, unsigned short, unsigned short);
 
-    ButtonDevice& GetButton();
-    const String& GetName();
-    const String& GetVersion();
-    bool          IsOnline();
-    const String& GetIPAddress();
+    ButtonDevice&  GetButton();
+    GestureDevice& GetSensor();
+    const String&  GetName();
+    const String&  GetVersion();
+    bool           IsOnline();
+    const String&  GetIPAddress();
 
 protected:
+    bool setupGestureSensor();
     void setupWiFiConnection();
     void ensureWiFiConnected();
-    void handleButtonPress();
     void enterDeepSleep();
+    void handleButtonPress();
+    void handleGestureDetection();
 
     bool sendHTTPRequest(const char*);
 };
