@@ -7,7 +7,7 @@
     "buildPreferences": [
         [
             "build.extra_flags",
-            "-DDEBUG_MODE=1"
+            "-DDEBUG_MODE=1 -DIRIS_UUID_NS=\"04a0335e-bea7-429a-50b6-b4621d9570\""
         ]
     ],
     "programmer": "esptool"

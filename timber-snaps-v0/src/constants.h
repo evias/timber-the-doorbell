@@ -13,6 +13,33 @@
 constexpr bool TIMBER_SNAPS_DEBUG_ENABLED = (bool) DEBUG_MODE;
 
 /**
+ * You may update the UUID namespace. Should contain a 30 bytes UUID,
+ * i.e. 34 characters with dashes).
+ * e.g.: `-DIRIS_UUID_NS="04a0335e-bea7-429a-50b6-b4621d9570"`
+ *
+ * CAUTION: If you modify this value, you must update the TIMBER firmware as well.
+ */
+#ifndef IRIS_UUID_NS
+    #define IRIS_UUID_NS "04a0335e-bea7-429a-50b6-b4621d9570";
+#endif
+
+/**
+ * Bluetooth UUIDs (BLE) for the Camera device.
+ * UUID namespace uses first 30 bytes of SHA1 hash as illustrated.
+ *
+ * ```python
+ * # results in: 04a0335ebea7429a50b6b4621d957099c68e08f3 (40 bytes)
+ * doc = "github.com/evias/timber-the-doorbell"
+ * ns = hash(doc)[:30] # Use first 30 bytes
+ * ```
+ */
+
+#define IRISBLE_SERVICE_UUID   IRIS_UUID_NS "00" // BLE Connect (Service)
+#define IRISBLE_TRIGGER_UUID   IRIS_UUID_NS "01" // Trigger Snapshot
+#define IRISBLE_SIZE_UUID      IRIS_UUID_NS "02" // Image Size
+#define IRISBLE_DATA_UUID      IRIS_UUID_NS "03" // Image Data
+
+/**
  * Camera pins for ESP32-CAM-MB
  */
 #define IRISCAM_PWDN_GPIO_NUM     32
@@ -29,21 +56,5 @@ constexpr bool TIMBER_SNAPS_DEBUG_ENABLED = (bool) DEBUG_MODE;
 #define IRISCAM_VSYNC_GPIO_NUM    25
 #define IRISCAM_HREF_GPIO_NUM     23
 #define IRISCAM_PCLK_GPIO_NUM     22
-
-/**
- * Bluetooth UUIDs (BLE) for the Camera device.
- * UUID namespace uses first 30 bytes of SHA1 hash as illustrated.
- *
- * ```python
- * # results in: 04a0335ebea7429a50b6b4621d957099c68e08f3
- * doc = "github.com/evias/timber-the-doorbell"
- * ns = hash(doc)[:32]
- * ```
- */
-
-#define IRISBLE_SERVICE_UUID   "04a0335e-bea7-429a-50b6-b4621d957000" // BLE Connect (Service)
-#define IRISBLE_TRIGGER_UUID   "04a0335e-bea7-429a-50b6-b4621d957001" // Trigger Snapshot
-#define IRISBLE_SIZE_UUID      "04a0335e-bea7-429a-50b6-b4621d957002" // Image Size
-#define IRISBLE_DATA_UUID      "04a0335e-bea7-429a-50b6-b4621d957003" // Image Data
 
 #endif

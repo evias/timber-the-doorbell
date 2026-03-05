@@ -9,5 +9,6 @@
             "build.extra_flags",
             "-DWIFI_SSID=\"Default\" -DWIFI_PASS=\"Default\" -DWEBHOOK_URL=\"http://homeassistant.local:8123/api/webhook/doorbell\" -DDEBUG_MODE=1"
         ]
-    ]
+    ],
+    "programmer": "esptool"
 }
