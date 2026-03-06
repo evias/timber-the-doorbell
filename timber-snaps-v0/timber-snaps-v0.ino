@@ -18,7 +18,7 @@
 #include "src/constants.h"
 #include "src/camera.h"
 
-#define TIMBER_SNAPS_VERSION "0.1.0"
+#define TIMBER_SNAPS_VERSION "0.1.1"
 
 Camera* IRIS;
 

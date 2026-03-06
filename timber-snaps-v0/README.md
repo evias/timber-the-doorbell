@@ -5,6 +5,26 @@ contains the firmware source code (C++) for a ESP32-CAM-MB board.
 
 Refer to [3D Printing](#3d-printing) for the model files.
 
+## Developer notes
+
+This sketch contains may be built/uploaded using Arduino IDE or VSCode.
+I personally use VSCode with the added `vscode-arduino` community extension.
+
+When building with VSCode, the `.vscode/arduino.json` must be updated to reflect
+the build configuration for the **IRIS firmware**, i.e.:
+
+```bash
+# Prepare for building the IRIS firmware (ESP32-CAM-MB).
+cp .vscode/arduino.iris.json .vscode/arduino.json
+```
+
+After having done that, enable the `vscode-arduino` extension for your workspace
+and use the `Arduino: Verify` and `Arduino: Upload` actions from the command
+palette to build and/or upload the firmware to your chosen board.
+
+The default `.vscode/arduino.json` file contains building instruction for `TIMBER`.
+
+
 ## Implementation notes
 
 - Main sketch file: [`timber-snaps-v0.ino`](./timber-snaps-v0.ino)

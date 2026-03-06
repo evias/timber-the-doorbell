@@ -20,7 +20,7 @@ constexpr bool TIMBER_SNAPS_DEBUG_ENABLED = (bool) DEBUG_MODE;
  * CAUTION: If you modify this value, you must update the TIMBER firmware as well.
  */
 #ifndef IRIS_UUID_NS
-    #define IRIS_UUID_NS "04a0335e-bea7-429a-50b6-b4621d9570";
+    #define IRIS_UUID_NS "04a0335e-bea7-429a-50b6-b4621d9570"
 #endif
 
 /**
