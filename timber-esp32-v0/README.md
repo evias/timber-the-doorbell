@@ -7,6 +7,25 @@ Note that for outside-use, the ESP32 board is plugged on a `2x AA` batteries pac
 on the bottom plate of the esp32 box.
 Refer to [3D Printing](#3d-printing) for the model files.
 
+## Developer notes
+
+This sketch contains may be built/uploaded using Arduino IDE or VSCode.
+I personally use VSCode with the added `vscode-arduino` community extension.
+
+When building with VSCode, the `.vscode/arduino.json` must be updated to reflect
+the build configuration for the **TIMBER firmware**, i.e.:
+
+```bash
+# Prepare for building the TIMBER firmware (ESP32-DEVKIT-V1).
+cp .vscode/arduino.timber.json .vscode/arduino.json
+```
+
+After having done that, enable the `vscode-arduino` extension for your workspace
+and use the `Arduino: Verify` and `Arduino: Upload` actions from the command
+palette to build and/or upload the firmware to your chosen board.
+
+The default `.vscode/arduino.json` file contains building instruction for `TIMBER`.
+
 ## Implementation notes
 
 - Main sketch file: [`timber-esp32-v0.ino`](./timber-esp32-v0.ino)

@@ -2,8 +2,8 @@
 #ifndef TIMBER_TYPES_H
 #define TIMBER_TYPES_H
 
-#include <Arduino.h> // String
-#include <Wire.h>    // Wire
+#include <Arduino.h>
+#include <Wire.h>
 
 /// @brief  Device describes a device wired with pins to a ESP32 board.
 /// @tparam NUM_PINS 

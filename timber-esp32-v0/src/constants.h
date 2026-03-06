@@ -31,19 +31,42 @@
  * e.g.: `-DWEBHOOK_URL="http://homeassistant.local:8123/api/webhook/doorbell"`
  */
 #ifndef WEBHOOK_URL
-    #define WEBHOOK_URL "http://localhost:8123/api/webhook/doorbell";
+    #define WEBHOOK_URL "http://localhost:8123/api/webhook/doorbell"
 #endif
 
 constexpr bool TIMBER_DEBUG_ENABLED = (bool) DEBUG_MODE;
 constexpr char TIMBER_WIFI_SSID[] = WIFI_SSID;
 constexpr char TIMBER_WIFI_PASS[] = WIFI_PASS;
+constexpr char URL_BUTTON_PRESS[] = WEBHOOK_URL;
+
+/**
+ * You may update the UUID namespace. Should contain a 30 bytes UUID,
+ * i.e. 34 characters with dashes).
+ * e.g.: `-DIRIS_UUID_NS="04a0335e-bea7-429a-50b6-b4621d9570"`
+ *
+ * CAUTION: If you modify this value, you must update the IRIS firmware as well.
+ */
+#ifndef IRIS_UUID_NS
+    #define IRIS_UUID_NS "04a0335e-bea7-429a-50b6-b4621d9570"
+#endif
+
+/**
+ * Iris-of-Timber BLE service details.
+ * IMPORTANT: These *must* match the Iris firmware.
+ */
+#define IRISBLE_SERVICE_UUID   IRIS_UUID_NS "00" // BLE Connect (Service)
+#define IRISBLE_TRIGGER_UUID   IRIS_UUID_NS "01" // Trigger Snapshot
+#define IRISBLE_SIZE_UUID      IRIS_UUID_NS "02" // Image Size
+#define IRISBLE_DATA_UUID      IRIS_UUID_NS "03" // Image Data
 
 /**
  * Timing Configuration (in milliseconds)
  */
-constexpr char URL_BUTTON_PRESS[] = WEBHOOK_URL;
-constexpr unsigned long DEBOUNCE_DELAY = 50;   // Debounce time
-constexpr unsigned long HTTP_TIMEOUT   = 5000; // 5 seconds HTTP request timeout
+constexpr unsigned long DEBOUNCE_DELAY = 50;    // Debounce time
+constexpr unsigned long HTTP_TIMEOUT   = 5000;  // 5 seconds HTTP request timeout
+constexpr unsigned long UPTIME_MAX_MS  = 15000; // 15 seconds max uptime
+constexpr unsigned long BLE_SCAN_INTERVAL_MS = 5000; // 5 seconds interval
+constexpr unsigned long SNAPSHOT_INTERVAL_MS = 3000; // 3 seconds interval
 
 /**
  * 2-pin Press Button
