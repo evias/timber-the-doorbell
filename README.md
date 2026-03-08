@@ -4,7 +4,7 @@ A tiny (over-engineered) *smart door bell* project. This repository contains the
 source code (C++) for:
 
 - **Tímber**: A `ESP32-DEVKIT-V1` development board: [`timber-esp32-v0`](./timber-esp32-v0).
-- **Iris**: A `ESP32-CAM-MB` camera board: [`timber-snaps-v0`](./timber-snaps-v0).
+- **Iris**: A `ESP32-CAM-MB` camera board: [`timber-iris-v0`](./timber-iris-v0).
 
 ## Developer notes
 
@@ -35,7 +35,7 @@ This project includes 3D-printed components.
 Refer to each sketch's README for more details:
 
 - [`Door bell 3D Models`](./timber-esp32-v0/README.md#3d-printing)
-- [`Camera 3D Models`](./timber-snaps-v0/README.md#3d-printing)
+- [`Camera 3D Models`](./timber-iris-v0/README.md#3d-printing)
 
 ## License
 

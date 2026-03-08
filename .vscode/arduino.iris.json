@@ -1,5 +1,5 @@
 {
-    "sketch": "timber-snaps-v0/timber-snaps-v0.ino",
+    "sketch": "timber-iris-v0/timber-iris-v0.ino",
     "port": "/dev/tty.usbserial-0001",
     "board": "esp32:esp32:esp32",
     "output": "../build/IRIS",

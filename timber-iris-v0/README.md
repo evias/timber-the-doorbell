@@ -27,7 +27,7 @@ The default `.vscode/arduino.json` file contains building instruction for `TIMBE
 
 ## Implementation notes
 
-- Main sketch file: [`timber-snaps-v0.ino`](./timber-snaps-v0.ino)
+- Main sketch file: [`timber-iris-v0.ino`](./timber-iris-v0.ino)
   - Simple interface to Arduino which creates a global `Camera` instance.
 - `Camera` class: [`src/camera.h`](./src/camera.h)
   - Handles the setup/configuration of the camera device.
