@@ -50,16 +50,15 @@ void DoorBell::Setup()
     }
     SPIFFS.begin(true);
 
-    int attempts = 0;
-    while (++attempts <= 5 && !setupGestureSensor()) {
-        Serial.println(String("Waiting for gesture sensor"));
-        delay(100);
-    }
+    setupGestureSensor();
+    delay(1000);
+    gesture_.SelectBank(0);
+    delay(50);
 
     setupWiFiConnection();
     setupCameraConnection();
 
-    sendDebugMessage(String("DoorBell setup [OK]"));
+    sendDebugMessage(String("[OK] DoorBell setup done"));
 }
 
 /// @brief The OnWake method identifies the wakeup cause, if it's boot do nothing.
@@ -103,7 +102,7 @@ void DoorBell::OnLoop()
         case LOW: // button pressed
             btn_press_at_ = uptime_ms;
             btn_active_ = true;
-            Serial.println(String("[v] Button pressed..."));
+            Serial.println(String("[OK] Button pressed..."));
             break;
         case HIGH: // button released
             btn_release_at_ = uptime_ms;
@@ -125,7 +124,6 @@ void DoorBell::OnLoop()
         sendDebugMessage(String("[BLE] Scanning for Iris-of-Timber..."));
         BLEDevice::getScan()->start(5, false);
         ble_lastscan_at_ = uptime_ms;
-        last_activity_at_ = ble_lastscan_at_;
         delay(100);
     }
 
@@ -161,7 +159,7 @@ void DoorBell::OnData(BLERemoteCharacteristic* op, uint8_t* data, size_t length,
                 Serial.print("\n");
 
                 snapshot_.close();
-                Serial.println(String("[INFO] Image saved (SPIFFS)!"));
+                Serial.println(String("[OK] Image saved (SPIFFS)!"));
             }
         }
     }
@@ -233,29 +231,15 @@ const String &DoorBell::GetIPAddress() {
 /// @brief The setupGestureSensor method configures the gesture sensor device.
 bool DoorBell::setupGestureSensor()
 {
-    // Order here is SDA, SCL
-    Wire.begin(gesture_.dev.pins[1], gesture_.dev.pins[2]);
-    Wire.setClock(400000);
+    pinMode(gesture_.dev.pins[1], INPUT_PULLUP);
+    pinMode(gesture_.dev.pins[2], INPUT_PULLUP);
     delay(50);
 
-    // Wake up the gesture sensor
-    Wire.beginTransmission(PAJ7620_CHIP_ADDR);
-    Wire.endTransmission();
-    delay(5);
-    Wire.beginTransmission(PAJ7620_CHIP_ADDR);
-    Wire.endTransmission();
+    // Order here is SDA, SCL
+    Wire.begin(gesture_.dev.pins[1], gesture_.dev.pins[2]);
+    Wire.setClock(25000);
 
-    // Verify chip
-    gesture_.Write(PAJ7620_BANK_SEL, 0);
-    if(gesture_.Read(0x00) != 0x20) return false;
-
-    // Load init
-    for(uint16_t i = 0; i < sizeof(PAJ7620_INIT_SEQUENCE)/2; i++) {
-        gesture_.Write(
-            pgm_read_byte(&PAJ7620_INIT_SEQUENCE[i][0]),
-            pgm_read_byte(&PAJ7620_INIT_SEQUENCE[i][1]));
-    }
-    gesture_.Write(PAJ7620_BANK_SEL, 0);
+    Serial.println("[OK] Gesture sensor initialized");
     return true;
 }
 
@@ -294,7 +278,7 @@ void DoorBell::setupWiFiConnection()
         password = String(TIMBER_WIFI_PASS);
         settings_.end();
 
-        sendDebugMessage(String("WiFi credentials saved"));
+        sendDebugMessage(String("[OK] WiFi credentials saved"));
     }
 
     // Connect to WiFi if possible
