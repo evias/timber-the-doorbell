@@ -19,8 +19,6 @@
 #include "src/constants.h"
 #include "src/door_bell.h"
 
-#define TIMBER_VERSION "0.2.0"
-
 DoorBell* TIMBER;
 
 void setup() {
@@ -34,7 +32,7 @@ void setup() {
 
     delay(2000);
     Serial.println();
-    Serial.println(F("DoorBell [OK]"));
+    Serial.printf("[OK] Firmware: TIMBER@%s\n", TIMBER_VERSION);
 
     TIMBER->OnWake();
 }

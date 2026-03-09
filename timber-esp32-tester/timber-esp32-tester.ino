@@ -1,4 +1,4 @@
-// timber-tester/timber-tester.ino
+// timber-esp32-tester/timber-esp32-tester.ino
 // An arduino sketch for testing the TIMBER ESP32 board firmware.
 // Tester for hardware components wiring and custom libraries being used
 // by the Timber firmware, e.g. SPIFFS, and WiFi connection.
@@ -32,10 +32,12 @@ void setup()
     delay(50);
 
     delay(2000);
-    Serial.println("[OK] Setup done...");
 
     displayBoardInfo(true);
     testPAJ7620();
+
+    Serial.println();
+    Serial.printf("Firmware: TIMBER.tester@%s\n", TIMBER_VERSION);
 }
 
 void loop()
@@ -90,8 +92,10 @@ void displayBoardInfo(bool header)
     Serial.print("Free Heap: ");
     Serial.print(ESP.getFreeHeap());
     Serial.println(" bytes");
+    Serial.printf("Firmware: TIMBER.tester@%s\n", TIMBER_VERSION);
 
     uint8_t chipID = readRegister(0x00);
+    Serial.println();
     Serial.printf("PAJ7620 Address: 0x%02X\n", PAJ7620_CHIP_ADDR);
     Serial.printf("PAJ7620 ID: 0x%02X\n", chipID);
     Serial.printf("PAJ7620 Pins: INT: D%d, SDA: D%d, SCL: D%d\n", 

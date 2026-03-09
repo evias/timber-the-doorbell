@@ -2,6 +2,8 @@
 #ifndef TIMBER_SNAPS_CONSTANTS_H
 #define TIMBER_SNAPS_CONSTANTS_H
 
+#define IRIS_VERSION "0.3.0"
+
 /**
  * You may enable debug mode in .vscode/arduino.json.
  * e.g.: `-DDEBUG_MODE=1`

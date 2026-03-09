@@ -1,0 +1,13 @@
+{
+    "sketch": "timber-iris-tester/timber-iris-tester.ino",
+    "port": "/dev/tty.usbserial-0001",
+    "board": "esp32:esp32:esp32",
+    "output": "../build/IRIS.tester",
+    "configuration": "JTAGAdapter=default,PSRAM=disabled,CPUFreq=240,FlashMode=qio,FlashFreq=80,FlashSize=4M,UploadSpeed=921600,LoopCore=1,EventsCore=1,DebugLevel=none,PartitionScheme=default,EraseFlash=none,ZigbeeMode=disabled",
+    "buildPreferences": [
+        [
+            "build.extra_flags",
+            "-DDEBUG_MODE=1 -DLOG_INTERVAL_MS=30000"
+        ]
+    ]
+}

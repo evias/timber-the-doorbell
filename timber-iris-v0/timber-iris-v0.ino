@@ -18,20 +18,18 @@
 #include "src/constants.h"
 #include "src/camera.h"
 
-#define TIMBER_SNAPS_VERSION "0.1.1"
-
 Camera* IRIS;
 
 void setup() {
     Serial.begin(9600);
     delay(2000); // Wait for serial..
 
-    IRIS = new Camera("Iris", TIMBER_SNAPS_VERSION);
+    IRIS = new Camera("Iris", IRIS_VERSION);
     IRIS->Setup();
 
     delay(2000);
     Serial.println();
-    Serial.println("Camera is now waiting to take snapshots...");
+    Serial.printf("[OK] Firmware: IRIS@%s\n", IRIS_VERSION);
 }
 
 void loop() {

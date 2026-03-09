@@ -2,6 +2,8 @@
 #ifndef TIMBER_CONSTANTS_H
 #define TIMBER_CONSTANTS_H
 
+#define TIMBER_VERSION "0.3.0"
+
 /**
  * Don't forget to change the WiFi SSID in .vscode/arduino.json.
  * e.g.: `-DWIFI_SSID="YourWiFiNetwork"`

@@ -4,7 +4,9 @@ A tiny (over-engineered) *smart door bell* project. This repository contains the
 source code (C++) for:
 
 - **Tímber**: A `ESP32-DEVKIT-V1` development board: [`timber-esp32-v0`](./timber-esp32-v0).
+- **Tímber tester**: `timber-esp32-tester/timber-esp32-tester.ino`
 - **Iris**: A `ESP32-CAM-MB` camera board: [`timber-iris-v0`](./timber-iris-v0).
+- **Iris tester**: `timber-iris-tester/timber-iris-tester.ino`
 
 ## Developer notes
 
