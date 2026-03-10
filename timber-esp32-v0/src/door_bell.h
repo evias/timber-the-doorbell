@@ -37,24 +37,19 @@ public:
     static void OnData(BLERemoteCharacteristic*, uint8_t*, size_t, bool);
 
     void SetButton(const char*, unsigned short);
-    // The order here is ID, INT, SDA, SCL
-    void SetSensor(const char*, unsigned short, unsigned short, unsigned short);
 
     ButtonDevice&  GetButton();
-    GestureDevice& GetSensor();
     const String&  GetName();
     const String&  GetVersion();
     bool           IsOnline();
     const String&  GetIPAddress();
 
 protected:
-    bool setupGestureSensor();
     void setupCameraConnection();
     void setupWiFiConnection();
     void ensureWiFiConnected();
     void enterDeepSleep();
     void handleButtonPress();
-    void handleGestureDetection();
     void requestCameraSnapshot();
 
     bool sendHTTPRequest(const char*);
@@ -63,7 +58,6 @@ protected:
 private:
     // Devices connections
     ButtonDevice   button_;
-    GestureDevice gesture_;
     BLEClient* ble_client_; // Camera connection
     BLERemoteCharacteristic* ble_trigger_op_; // Triggers camera capture
 

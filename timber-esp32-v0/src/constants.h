@@ -79,22 +79,4 @@ constexpr unsigned long SNAPSHOT_INTERVAL_MS = 3000; // 3 seconds interval
 const unsigned short PRESS_BUTTON_PIN  = 15; // D15
 const gpio_num_t GPIO_BUTTON_PIN = GPIO_NUM_15;
 
-/**
- * 3-pin 3D Gesture Sensor (+ VCC/GND)
- *
- * esp32(D4)  -> S(INT)
- * esp32(D23) -> S(SCL)
- * esp32(D19) -> S(SDA)
- */
-const unsigned short GESTURE_INT_PIN = 4; // D4
-const unsigned short GESTURE_SCL_PIN = 23; // D23
-const unsigned short GESTURE_SDA_PIN = 19; // D19
-
-/**
- * PAJ7620 chip configuration for direct registers access.
- */
-#define PAJ7620_CHIP_ADDR   0x73 // I2C address of the chip
-#define PAJ7620_BANK_SEL    0xEF // "bank selection" (bank 0/bank 1)
-#define PAJ7620_GESTURE_REG 0x43 // gesture result registry
-
 #endif

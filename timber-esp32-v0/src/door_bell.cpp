@@ -50,11 +50,6 @@ void DoorBell::Setup()
     }
     SPIFFS.begin(true);
 
-    setupGestureSensor();
-    delay(1000);
-    gesture_.SelectBank(0);
-    delay(50);
-
     setupWiFiConnection();
     setupCameraConnection();
 
@@ -114,8 +109,8 @@ void DoorBell::OnLoop()
         }
     }
 
-    handleGestureDetection();
-    delay(10);
+    // handleGestureDetection();
+    // delay(10);
 
     // Re-scan for Iris-of-Timber if necessary
     if (!ble_connected_ && (
@@ -176,32 +171,10 @@ void DoorBell::SetButton(const char* id, unsigned short pin_in)
     has_button_ = true;
 }
 
-/// @brief The SetSensor method registers a 3D gesture sensor with 3 (data) pins.
-/// @param id A name for the component, e.g. "my-gesture-device".
-/// @param pin_int A pin number, i.e. he ESP32 pin number wired to INT of the sensor.
-/// @param pin_sda A pin number, i.e. he ESP32 pin number wired to SDA of the sensor.
-/// @param pin_scl A pin number, i.e. he ESP32 pin number wired to SCL of the sensor.
-void DoorBell::SetSensor(
-    const char*id,
-    unsigned short pin_int,
-    unsigned short pin_sda,
-    unsigned short pin_scl
-) {
-    gesture_ = GestureDevice{Device<3>{String(id), {pin_int, pin_sda, pin_scl}}};
-    gesture_.addr = PAJ7620_CHIP_ADDR;
-    has_sensor_ = true;
-}
-
 /// @brief The GetButton method returns a ButtonDevice instance.
 /// @return The initialized press button ButtonDevice instance.
 ButtonDevice& DoorBell::GetButton() {
     return this->button_;
-}
-
-/// @brief The GetSensor method returns a GestureDevice instance.
-/// @return The initialized gesture sensor GestureDevice instance.
-GestureDevice& DoorBell::GetSensor() {
-    return this->gesture_;
 }
 
 /// @brief The GetName method returns the DoorBell name.
@@ -226,21 +199,6 @@ bool DoorBell::IsOnline() {
 /// @return Returns a local IP address when connected to a WiFi network.
 const String &DoorBell::GetIPAddress() {
     return this->ip_address_;
-}
-
-/// @brief The setupGestureSensor method configures the gesture sensor device.
-bool DoorBell::setupGestureSensor()
-{
-    pinMode(gesture_.dev.pins[1], INPUT_PULLUP);
-    pinMode(gesture_.dev.pins[2], INPUT_PULLUP);
-    delay(50);
-
-    // Order here is SDA, SCL
-    Wire.begin(gesture_.dev.pins[1], gesture_.dev.pins[2]);
-    Wire.setClock(25000);
-
-    Serial.println("[OK] Gesture sensor initialized");
-    return true;
 }
 
 /// @brief The setupCameraConnection method configures the BLE client to the cam.
@@ -374,40 +332,6 @@ void DoorBell::handleButtonPress()
     requestCameraSnapshot();
 }
 
-/// @brief The handleGestureDetection method detects gestures using a PAJ7260 chip.
-void DoorBell::handleGestureDetection()
-{
-    bool has_gesture = false;
-    String direction = "";
-
-    uint8_t res = gesture_.Read(PAJ7620_GESTURE_REG);
-    switch(res) {
-    case 0x01: direction = "RIGHT"; has_gesture = true; break;
-    case 0x02: direction = "LEFT"; has_gesture = true;  break;
-    case 0x04: direction = "UP"; has_gesture = true;    break;
-    case 0x08: direction = "DOWN"; has_gesture = true;  break;
-    case 0x10: direction = "NEAR"; has_gesture = true;  break;
-    case 0x20: direction = "FAR"; has_gesture = true;   break;
-    case 0x40: direction = "CW"; has_gesture = true;    break; // clockwise
-    case 0x80: direction = "CCW"; has_gesture = true;   break; // counter clockwise
-    default:
-        break;
-    }
-    delay(50);
-
-    if (!has_gesture) {
-        return ;
-    }
-
-    sendDebugMessage(String("[SENSOR] Detected gesture: " + direction));
-
-    unsigned long uptime_ms = millis();
-    last_activity_at_ = uptime_ms;
-    if (ble_snapshot_at_ == 0 || uptime_ms > ble_snapshot_at_ + SNAPSHOT_INTERVAL_MS) {
-        requestCameraSnapshot();
-    }
-}
-
 /// @brief The requestCameraSnapshot method sends a "trigger capture" operation.
 /// @details This method usees the BLE trigger characteristic which must be
 ///          registered and in-sync with the Iris firmware UUIDs.
@@ -415,6 +339,11 @@ void DoorBell::requestCameraSnapshot()
 {
     if (ble_trigger_op_ == nullptr) {
         Serial.println(String("[WARN] Trigger operation is not available"));
+        return ;
+    }
+
+    if (!ble_connected_) {
+        Serial.println(String("[WARN] BLE is not connected, skipping snapshot"));
         return ;
     }
 

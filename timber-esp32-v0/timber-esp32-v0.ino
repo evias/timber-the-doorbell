@@ -27,7 +27,6 @@ void setup() {
 
     TIMBER = new DoorBell("Timber", TIMBER_VERSION);
     TIMBER->SetButton("button", PRESS_BUTTON_PIN);
-    TIMBER->SetSensor("gesture", GESTURE_INT_PIN, GESTURE_SDA_PIN, GESTURE_SCL_PIN);
     TIMBER->Setup();
 
     delay(2000);
