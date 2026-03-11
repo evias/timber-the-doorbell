@@ -2,7 +2,7 @@
 #ifndef TIMBER_CONSTANTS_H
 #define TIMBER_CONSTANTS_H
 
-#define TIMBER_VERSION "0.3.0"
+#define TIMBER_VERSION "0.4.1"
 
 /**
  * Don't forget to change the WiFi SSID in .vscode/arduino.json.
@@ -78,5 +78,16 @@ constexpr unsigned long SNAPSHOT_INTERVAL_MS = 3000; // 3 seconds interval
  **/
 const unsigned short PRESS_BUTTON_PIN  = 15; // D15
 const gpio_num_t GPIO_BUTTON_PIN = GPIO_NUM_15;
+
+/**
+ * 4-pin OLED Screen (0.96")
+ *
+ * esp32(GND) -> GND
+ * esp32(3v3) -> VCC
+ * esp32(D4)  -> SDA
+ * esp32(D5)  -> SCL
+ */
+const unsigned short SCREEN_SDA_PIN = 4; // D4
+const unsigned short SCREEN_SCL_PIN = 5; // D5
 
 #endif

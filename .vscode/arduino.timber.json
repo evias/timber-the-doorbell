@@ -7,7 +7,7 @@
     "buildPreferences": [
         [
             "build.extra_flags",
-            "-DWIFI_SSID=\"Default\" -DWIFI_PASS=\"Default\" -DWEBHOOK_URL=\"http://homeassistant.local:8123/api/webhook/doorbell\" -DIRIS_UUID_NS=\"04a0335e-bea7-429a-50b6-b4621d9570\" -DDEBUG_MODE=1"
+            "-DWIFI_SSID=\"Default\" -DWIFI_PASS=\"Default\" -DWEBHOOK_URL=\"http://homeassistant.local:8123/api/webhook/doorbell\" -DIRIS_UUID_NS=\"04a0335e-bea7-429a-50b6-b4621d9570\" -DDEBUG_MODE=1 -DESP32=1"
         ]
     ]
 }

@@ -7,7 +7,7 @@
     "buildPreferences": [
         [
             "build.extra_flags",
-            "-DDEBUG_MODE=1 -DLOG_INTERVAL_MS=30000"
+            "-DDEBUG_MODE=1 -DLOG_INTERVAL_MS=30000 -DESP32=1"
         ]
     ]
 }

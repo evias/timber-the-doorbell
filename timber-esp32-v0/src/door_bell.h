@@ -3,6 +3,7 @@
 #define TIMBER_DOOR_BELL_H
 
 #include <Arduino.h>
+#include <Adafruit_SSD1306.h>
 #include <Preferences.h>
 #include <SPIFFS.h>
 #include <BLEDevice.h>
@@ -51,21 +52,23 @@ protected:
     void enterDeepSleep();
     void handleButtonPress();
     void requestCameraSnapshot();
+    void oledDisplayMessage(const char*);
 
     bool sendHTTPRequest(const char*);
     // bool sendLastSnapshot(const char*);
 
 private:
     // Devices connections
-    ButtonDevice   button_;
-    BLEClient* ble_client_; // Camera connection
+    ButtonDevice           button_;
+    Adafruit_SSD1306 oled_display_;
+    BLEClient*                   ble_client_; // Camera connection
     BLERemoteCharacteristic* ble_trigger_op_; // Triggers camera capture
 
     // Devices states
     bool            has_button_;
+    bool            has_screen_;
     bool             btn_state_;
     bool            btn_active_;
-    bool            has_sensor_;
     bool         ble_connected_;
 
     unsigned long         started_at_;

@@ -11,6 +11,7 @@
  * ═══════════════════════════════════════════════════════════════════════════
  */
 #include <Arduino.h>
+#include <Adafruit_SSD1306.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <BLEDevice.h>
@@ -29,7 +30,7 @@ void setup() {
     TIMBER->SetButton("button", PRESS_BUTTON_PIN);
     TIMBER->Setup();
 
-    delay(2000);
+    delay(500);
     Serial.println();
     Serial.printf("[OK] Firmware: TIMBER@%s\n", TIMBER_VERSION);
 

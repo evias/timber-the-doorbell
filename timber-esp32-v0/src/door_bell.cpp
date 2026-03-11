@@ -8,6 +8,7 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEScan.h>
+#include <splash.h>
 
 #include "door_bell.h"
 #include "constants.h"
@@ -27,6 +28,7 @@ DoorBell::DoorBell(const char* name, const char* version)
       online_(false),
       ip_address_("Unknown"),
       has_button_(false),
+      has_screen_(false),
       btn_state_(HIGH), // HIGH=not pressed
       btn_active_(false),
       ble_connected_(false),
@@ -38,6 +40,8 @@ DoorBell::DoorBell(const char* name, const char* version)
       ble_lastscan_at_(0)
 {
     sendDebugMessage(String("Hola! I am Timber :]"));
+
+    oled_display_ = Adafruit_SSD1306(128, 64, &Wire, -1); // unused reset
 }
 
 /// @brief The Setup method initializes configured pin numbers.
@@ -49,11 +53,36 @@ void DoorBell::Setup()
         pinMode(button_.dev.pins[1], INPUT_PULLUP);
     }
     SPIFFS.begin(true);
+    Wire.begin(SCREEN_SDA_PIN, SCREEN_SCL_PIN); // I2C on D4/D5
+    delay(50);
+
+    if (!oled_display_.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+        Serial.println(String("[WARN] OLED Display Initialization Error"));
+    } else {
+        has_screen_ = true;
+        sendDebugMessage(String("[OK] OLED Display setup done"));
+        oledDisplayMessage("timber$ \n\nBienvenid@");
+    }
+
+    bool update_msg = false;
+    esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
+    switch (wakeup_reason) {
+        case ESP_SLEEP_WAKEUP_EXT0:
+            oledDisplayMessage("timber$ \n\nDING DONG!");
+            delay(1000);
+            oledDisplayMessage("timber$ \n\nAHORA VOY!");
+            update_msg = true;
+            break;
+        default:
+            break;
+    }
 
     setupWiFiConnection();
     setupCameraConnection();
 
     sendDebugMessage(String("[OK] DoorBell setup done"));
+
+    if (update_msg) oledDisplayMessage("timber$ \n\nConectad@!");
 }
 
 /// @brief The OnWake method identifies the wakeup cause, if it's boot do nothing.
@@ -66,6 +95,8 @@ void DoorBell::OnWake()
         case ESP_SLEEP_WAKEUP_EXT0:
             last_activity_at_ = millis();
             handleButtonPress();
+            delay(2000);
+            oledDisplayMessage("timber$ \n\nBienvenid@");
 
             // Go back to sleep after handling button press
             delay(500);
@@ -104,13 +135,12 @@ void DoorBell::OnLoop()
             btn_active_ = false;
             if (btn_release_at_ - btn_press_at_ >= DEBOUNCE_DELAY) {
                 handleButtonPress();
+                delay(2000);
+                oledDisplayMessage("timber$ \n\nBienvenid@");
             }
             break;
         }
     }
-
-    // handleGestureDetection();
-    // delay(10);
 
     // Re-scan for Iris-of-Timber if necessary
     if (!ble_connected_ && (
@@ -323,6 +353,7 @@ void DoorBell::enterDeepSleep()
 /// CAUTION: URL_BUTTON_PRESS is defined with -DWEBHOOK_URL build flag.
 void DoorBell::handleButtonPress()
 {
+    oledDisplayMessage("timber$ \n\nAHORA VOY!");
     if (sendHTTPRequest(URL_BUTTON_PRESS)) {
         Serial.println(String("[INFO] Press notification sent successfully!"));
     } else {
@@ -354,8 +385,26 @@ void DoorBell::requestCameraSnapshot()
     ble_snapshot_at_ = millis();
 }
 
+/// @brief The oledDisplayMessage method displays msg on the OLED 0.96" screen.
+/// @param msg The message to display.
+void DoorBell::oledDisplayMessage(const char* msg)
+{
+    if (! has_screen_) {
+        Serial.println(String("[WARN] Skipping message display (OLED is not available)"));
+        return ;
+    }
+
+    oled_display_.clearDisplay();
+    oled_display_.setTextSize(2);
+    oled_display_.setTextColor(SSD1306_WHITE);
+    oled_display_.setCursor(0, 0);
+    oled_display_.println(msg);
+    oled_display_.display();
+}
+
 /// @brief The sendHTTPRequest method sends a HTTP request to a HASS webhook.
 /// @details This method ensure WiFi connectivity or fails.
+/// @param url The URL to which to send the HTTP request.
 bool DoorBell::sendHTTPRequest(const char* url)
 {
     // Ensure WiFi is connected
