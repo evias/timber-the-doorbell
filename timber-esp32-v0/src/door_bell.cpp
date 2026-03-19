@@ -69,7 +69,7 @@ void DoorBell::Setup()
     switch (wakeup_reason) {
         case ESP_SLEEP_WAKEUP_EXT0:
             oledDisplayMessage("timber$ \n\nDING DONG!");
-            delay(1000);
+            delay(1500);
             oledDisplayMessage("timber$ \n\nAHORA VOY!");
             update_msg = true;
             break;
@@ -157,6 +157,9 @@ void DoorBell::OnLoop()
     if (uptime_ms >= last_activity_at_ + UPTIME_MAX_MS) {
         enterDeepSleep();
     }
+
+    sendDebugMessage(String("timber$ on to the next loop!"));
+    delay(300);
 }
 
 void DoorBell::OnData(BLERemoteCharacteristic* op, uint8_t* data, size_t length, bool done)
@@ -399,6 +402,11 @@ void DoorBell::oledDisplayMessage(const char* msg)
     oled_display_.setTextColor(SSD1306_WHITE);
     oled_display_.setCursor(0, 0);
     oled_display_.println(msg);
+
+    String ver = String("\n\n              v") + TIMBER_VERSION;
+    oled_display_.setTextSize(1);
+    oled_display_.setCursor(0, 34);
+    oled_display_.println(ver.c_str());
     oled_display_.display();
 }
 
