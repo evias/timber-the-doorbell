@@ -24,13 +24,13 @@ DoorBell* TIMBER;
 
 void setup() {
     Serial.begin(9600);
-    delay(2000); // Wait for serial..
+    delay(500); // Wait for serial..
 
     TIMBER = new DoorBell("Timber", TIMBER_VERSION);
     TIMBER->SetButton("button", PRESS_BUTTON_PIN);
     TIMBER->Setup();
 
-    delay(500);
+    delay(50);
     Serial.println();
     Serial.printf("[OK] Firmware: TIMBER@%s\n", TIMBER_VERSION);
 

@@ -69,8 +69,6 @@ void DoorBell::Setup()
     switch (wakeup_reason) {
         case ESP_SLEEP_WAKEUP_EXT0:
             oledDisplayMessage("timber$ \n\nDING DONG!");
-            delay(1500);
-            oledDisplayMessage("timber$ \n\nAHORA VOY!");
             update_msg = true;
             break;
         default:
@@ -78,8 +76,9 @@ void DoorBell::Setup()
     }
 
     setupWiFiConnection();
-    setupCameraConnection();
+    if (update_msg) oledDisplayMessage("timber$ \n\nAHORA VOY!");
 
+    setupCameraConnection();
     sendDebugMessage(String("[OK] DoorBell setup done"));
 
     if (update_msg) oledDisplayMessage("timber$ \n\nConectad@!");
@@ -403,7 +402,7 @@ void DoorBell::oledDisplayMessage(const char* msg)
     oled_display_.setCursor(0, 0);
     oled_display_.println(msg);
 
-    String ver = String("\n\n              v") + TIMBER_VERSION;
+    String ver = String("\n\n       v") + TIMBER_VERSION;
     oled_display_.setTextSize(1);
     oled_display_.setCursor(0, 34);
     oled_display_.println(ver.c_str());
